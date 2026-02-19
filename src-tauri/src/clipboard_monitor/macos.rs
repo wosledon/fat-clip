@@ -5,24 +5,21 @@ use std::process::Command;
 /// Get HTML content from NSPasteboard
 pub fn get_macos_html() -> Result<String, String> {
     // Try using pbpaste with HTML format
-    let result = Command::new("pbpaste")
-        .arg("-Prefer")
-        .arg("html")
-        .output();
-    
+    let result = Command::new("pbpaste").arg("-Prefer").arg("html").output();
+
     match result {
         Ok(output) if output.status.success() => {
             let html = String::from_utf8_lossy(&output.stdout);
             let html = html.trim();
-            
+
             // Check if it's actually HTML
-            if html.starts_with('<') || html.contains('<html') || html.contains('<body') {
+            if html.starts_with('<') || html.contains("<html") || html.contains("<body") {
                 return Ok(html.to_string());
             }
         }
         _ => {}
     }
-    
+
     // Fallback: try using osascript
     let script = r#"try
     tell application "System Events"
@@ -35,12 +32,8 @@ pub fn get_macos_html() -> Result<String, String> {
     end tell
     return ""
 end try"#;
-    
-    match Command::new("osascript")
-        .arg("-e")
-        .arg(script)
-        .output() 
-    {
+
+    match Command::new("osascript").arg("-e").arg(script).output() {
         Ok(output) if output.status.success() => {
             let html = String::from_utf8_lossy(&output.stdout).trim().to_string();
             if !html.is_empty() {
@@ -70,12 +63,8 @@ pub fn get_macos_files() -> Result<Vec<String>, String> {
 on error
     return ""
 end try"#;
-    
-    match Command::new("osascript")
-        .arg("-e")
-        .arg(script)
-        .output() 
-    {
+
+    match Command::new("osascript").arg("-e").arg(script).output() {
         Ok(output) if output.status.success() => {
             let paths_str = String::from_utf8_lossy(&output.stdout);
             let files: Vec<String> = paths_str
@@ -84,7 +73,7 @@ end try"#;
                 .map(|s| s.trim().trim_matches('"').to_string())
                 .filter(|s| !s.is_empty() && s.starts_with('/'))
                 .collect();
-            
+
             if files.is_empty() {
                 // Try alternative method: check if clipboard contains a single file path
                 get_macos_single_file()
@@ -99,12 +88,12 @@ end try"#;
 /// Try to get a single file path from clipboard
 fn get_macos_single_file() -> Result<Vec<String>, String> {
     let result = Command::new("pbpaste").output();
-    
+
     match result {
         Ok(output) if output.status.success() => {
             let content = String::from_utf8_lossy(&output.stdout);
             let path = content.trim();
-            
+
             // Check if it's a file path
             if path.starts_with('/') && std::path::Path::new(path).exists() {
                 Ok(vec![path.to_string()])

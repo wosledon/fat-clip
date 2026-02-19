@@ -285,7 +285,11 @@ impl Database {
         Ok(clips)
     }
 
-    pub fn search_by_content_type(&self, content_type: &str, limit: i64) -> SqliteResult<Vec<ClipItem>> {
+    pub fn search_by_content_type(
+        &self,
+        content_type: &str,
+        limit: i64,
+    ) -> SqliteResult<Vec<ClipItem>> {
         let mut stmt = self.conn.prepare(
             "SELECT id, content_type, content, preview_text, tags, source_app, created_at, last_used_at, pinned, metadata
              FROM clip_items
@@ -450,7 +454,11 @@ impl Database {
 
     #[allow(dead_code)]
     /// Get clips by content type
-    pub fn get_clips_by_type(&self, content_type: ContentType, limit: i64) -> SqliteResult<Vec<ClipItem>> {
+    pub fn get_clips_by_type(
+        &self,
+        content_type: ContentType,
+        limit: i64,
+    ) -> SqliteResult<Vec<ClipItem>> {
         let mut stmt = self.conn.prepare(
             "SELECT id, content_type, content, preview_text, tags, source_app, created_at, last_used_at, pinned, metadata
              FROM clip_items

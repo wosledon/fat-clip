@@ -45,7 +45,9 @@ async fn save_image_clip(
     format: String,
     source_app: String,
 ) -> Result<db::ClipItem, String> {
-    state.clipboard_manager.save_image_clip(image_data, width, height, &format, source_app)
+    state
+        .clipboard_manager
+        .save_image_clip(image_data, width, height, &format, source_app)
 }
 
 #[tauri::command]
@@ -56,7 +58,9 @@ async fn save_rich_text_clip(
     plain_text: String,
     source_app: String,
 ) -> Result<db::ClipItem, String> {
-    state.clipboard_manager.save_rich_text_clip(html_content, rtf_content, plain_text, source_app)
+    state
+        .clipboard_manager
+        .save_rich_text_clip(html_content, rtf_content, plain_text, source_app)
 }
 
 #[tauri::command]
@@ -65,7 +69,9 @@ async fn save_file_clip(
     file_paths: Vec<String>,
     source_app: String,
 ) -> Result<db::ClipItem, String> {
-    state.clipboard_manager.save_file_clip(file_paths, source_app)
+    state
+        .clipboard_manager
+        .save_file_clip(file_paths, source_app)
 }
 
 #[tauri::command]
@@ -134,7 +140,7 @@ async fn delete_clip(state: tauri::State<'_, AppState>, id: String) -> Result<()
 #[tauri::command]
 async fn write_to_clipboard(_app: tauri::AppHandle, content: String) -> Result<(), String> {
     use arboard::Clipboard;
-    
+
     let mut clipboard = Clipboard::new().map_err(|e| e.to_string())?;
     clipboard.set_text(content).map_err(|e| e.to_string())
 }
@@ -147,22 +153,22 @@ async fn write_image_to_clipboard(
     use arboard::{Clipboard, ImageData};
     use image::ImageReader;
     use std::io::Cursor;
-    
+
     // Decode PNG to get raw RGBA data
     let reader = ImageReader::new(Cursor::new(&image_data))
         .with_guessed_format()
         .map_err(|e| e.to_string())?;
-    
+
     let img = reader.decode().map_err(|e| e.to_string())?;
     let rgba = img.to_rgba8();
     let (width, height) = rgba.dimensions();
-    
+
     let image_data = ImageData {
         width: width as usize,
         height: height as usize,
         bytes: rgba.into_raw().into(),
     };
-    
+
     let mut clipboard = Clipboard::new().map_err(|e| e.to_string())?;
     clipboard.set_image(image_data).map_err(|e| e.to_string())
 }
@@ -578,7 +584,6 @@ pub fn run() {
         ])
         .setup(move |app| {
             let app_handle = app.handle().clone();
-        
 
             // Get settings for window configuration
             let (always_on_top, show_on_startup, start_minimized, toggle_shortcut) = {

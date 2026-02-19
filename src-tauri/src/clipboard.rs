@@ -1,6 +1,6 @@
 use crate::db::{
     generate_content_hash, generate_image_hash, get_images_dir, get_thumbnails_dir, ClipItem,
-    ContentType, Database, ImageMetadata, FileMetadata, RichTextMetadata,
+    ContentType, Database, FileMetadata, ImageMetadata, RichTextMetadata,
 };
 use chrono::Utc;
 use std::path::PathBuf;
@@ -95,7 +95,8 @@ impl ClipboardManager {
 
         // Convert and save as PNG for consistency
         let png_data = self.convert_to_png(&image_data, width, height, format)?;
-        std::fs::write(&image_path, &png_data).map_err(|e| format!("Failed to save image: {}", e))?;
+        std::fs::write(&image_path, &png_data)
+            .map_err(|e| format!("Failed to save image: {}", e))?;
 
         // Generate thumbnail
         let thumbnail_path = self.generate_thumbnail(&png_data, &content_hash, width, height)?;
@@ -112,7 +113,12 @@ impl ClipboardManager {
         };
 
         // Preview text for image
-        let preview_text = format!("[Image] {}x{}px ({:.1} KB)", width, height, size_bytes as f64 / 1024.0);
+        let preview_text = format!(
+            "[Image] {}x{}px ({:.1} KB)",
+            width,
+            height,
+            size_bytes as f64 / 1024.0
+        );
 
         let item = ClipItem {
             id: content_hash.clone(),
@@ -185,7 +191,13 @@ impl ClipboardManager {
         let metadata = RichTextMetadata {
             has_html: html_content.is_some(),
             has_rtf: rtf_content.is_some(),
-            html_preview: html_content.map(|h| if h.len() > 100 { format!("{}...", &h[..100]) } else { h }),
+            html_preview: html_content.map(|h| {
+                if h.len() > 100 {
+                    format!("{}...", &h[..100])
+                } else {
+                    h
+                }
+            }),
         };
 
         let item = ClipItem {
@@ -236,7 +248,7 @@ impl ClipboardManager {
         // Calculate total size
         let mut total_size: u64 = 0;
         let mut valid_paths = Vec::new();
-        
+
         for path_str in &file_paths {
             if let Ok(metadata) = std::fs::metadata(path_str) {
                 total_size += metadata.len();
@@ -247,11 +259,19 @@ impl ClipboardManager {
         // Create preview text
         let file_count = valid_paths.len();
         let preview_text = if file_count == 1 {
-            format!("[File] {}", std::path::Path::new(&valid_paths[0]).file_name()
-                .and_then(|n| n.to_str())
-                .unwrap_or(&valid_paths[0]))
+            format!(
+                "[File] {}",
+                std::path::Path::new(&valid_paths[0])
+                    .file_name()
+                    .and_then(|n| n.to_str())
+                    .unwrap_or(&valid_paths[0])
+            )
         } else {
-            format!("[Files] {} items ({:.1} MB)", file_count, total_size as f64 / (1024.0 * 1024.0))
+            format!(
+                "[Files] {} items ({:.1} MB)",
+                file_count,
+                total_size as f64 / (1024.0 * 1024.0)
+            )
         };
 
         // Create metadata
@@ -293,12 +313,12 @@ impl ClipboardManager {
         // In a full implementation, you'd use the `image` crate to convert
         // Since we're using arboard which gives us raw bytes, we'll save as-is
         // and mark it properly
-        
+
         // If it's already PNG, return as-is
         if format.eq_ignore_ascii_case("png") {
             return Ok(image_data.to_vec());
         }
-        
+
         // For other formats, we'd need to decode and re-encode
         // This is a simplified version - in production you'd want proper image conversion
         Ok(image_data.to_vec())
@@ -365,7 +385,7 @@ impl ClipboardManager {
             if clip.content_type == ContentType::Image {
                 // Delete image file
                 let _ = std::fs::remove_file(&clip.content);
-                
+
                 // Delete thumbnail if exists
                 if let Some(metadata) = clip.metadata {
                     if let Ok(img_metadata) = serde_json::from_value::<ImageMetadata>(metadata) {

@@ -11,10 +11,20 @@ use crate::clipboard::ClipboardManager;
 #[allow(dead_code)]
 pub enum ClipboardContent {
     Text(String),
-    Image { data: Vec<u8>, width: u32, height: u32 },
+    Image {
+        data: Vec<u8>,
+        width: u32,
+        height: u32,
+    },
     Files(Vec<String>),
-    Html { html: String, text: String },
-    Rtf { rtf: String, text: String },
+    Html {
+        html: String,
+        text: String,
+    },
+    Rtf {
+        rtf: String,
+        text: String,
+    },
     None,
 }
 
@@ -72,8 +82,8 @@ impl ClipboardMonitor {
 
                         if should_process {
                             println!("New text content detected: {}", &text[..text.len().min(50)]);
-                            if let Err(e) = clipboard_manager
-                                .save_text_clip(text, "Unknown".to_string())
+                            if let Err(e) =
+                                clipboard_manager.save_text_clip(text, "Unknown".to_string())
                             {
                                 eprintln!("Failed to save text clip: {}", e);
                             } else {
@@ -99,8 +109,11 @@ impl ClipboardMonitor {
                         };
 
                         if should_process {
-                            println!("New image content detected: {}x{}px", image_data.width, image_data.height);
-                            
+                            println!(
+                                "New image content detected: {}x{}px",
+                                image_data.width, image_data.height
+                            );
+
                             // Convert image data to PNG
                             match convert_to_png(&image_data) {
                                 Ok(png_data) => {
@@ -178,7 +191,7 @@ fn check_windows_clipboard(
             let text = Clipboard::new().unwrap().get_text().unwrap_or_default();
             let combined = format!("{}{}", html, text);
             let hash = generate_hash(&combined);
-            
+
             let should_process = {
                 let mut last = last_html_hash.lock().unwrap();
                 if hash != *last {
@@ -211,7 +224,7 @@ fn check_windows_clipboard(
         Ok(files) if !files.is_empty() => {
             let combined = files.join("\n");
             let hash = generate_hash(&combined);
-            
+
             let should_process = {
                 let mut last = last_files_hash.lock().unwrap();
                 if hash != *last {
@@ -224,10 +237,7 @@ fn check_windows_clipboard(
 
             if should_process {
                 println!("New files detected: {} items", files.len());
-                if let Err(e) = clipboard_manager.save_file_clip(
-                    files,
-                    "Unknown".to_string(),
-                ) {
+                if let Err(e) = clipboard_manager.save_file_clip(files, "Unknown".to_string()) {
                     eprintln!("Failed to save file clip: {}", e);
                 } else {
                     let _ = app_handle.emit("clipboard-updated", ());
@@ -253,7 +263,7 @@ fn check_macos_clipboard(
             let text = Clipboard::new().unwrap().get_text().unwrap_or_default();
             let combined = format!("{}{}", html, text);
             let hash = generate_hash(&combined);
-            
+
             let should_process = {
                 let mut last = last_html_hash.lock().unwrap();
                 if hash != *last {
@@ -286,7 +296,7 @@ fn check_macos_clipboard(
         Ok(files) if !files.is_empty() => {
             let combined = files.join("\n");
             let hash = generate_hash(&combined);
-            
+
             let should_process = {
                 let mut last = last_files_hash.lock().unwrap();
                 if hash != *last {
@@ -299,10 +309,7 @@ fn check_macos_clipboard(
 
             if should_process {
                 println!("New files detected on macOS: {} items", files.len());
-                if let Err(e) = clipboard_manager.save_file_clip(
-                    files,
-                    "Unknown".to_string(),
-                ) {
+                if let Err(e) = clipboard_manager.save_file_clip(files, "Unknown".to_string()) {
                     eprintln!("Failed to save file clip: {}", e);
                 } else {
                     let _ = app_handle.emit("clipboard-updated", ());
@@ -326,7 +333,7 @@ fn check_linux_clipboard(
         Ok(files) if !files.is_empty() => {
             let combined = files.join("\n");
             let hash = generate_hash(&combined);
-            
+
             let should_process = {
                 let mut last = last_files_hash.lock().unwrap();
                 if hash != *last {
@@ -339,10 +346,7 @@ fn check_linux_clipboard(
 
             if should_process {
                 println!("New files detected on Linux: {} items", files.len());
-                if let Err(e) = clipboard_manager.save_file_clip(
-                    files,
-                    "Unknown".to_string(),
-                ) {
+                if let Err(e) = clipboard_manager.save_file_clip(files, "Unknown".to_string()) {
                     eprintln!("Failed to save file clip: {}", e);
                 } else {
                     let _ = app_handle.emit("clipboard-updated", ());
@@ -375,13 +379,13 @@ fn generate_image_hash(data: &[u8]) -> String {
 
 /// Convert arboard ImageData to PNG bytes
 fn convert_to_png(image_data: &arboard::ImageData) -> Result<Vec<u8>, String> {
-    use image::{ImageBuffer, Rgba, ImageFormat};
+    use image::{ImageBuffer, ImageFormat, Rgba};
     use std::io::Cursor;
 
     // Create image buffer from raw bytes
     let width = image_data.width as u32;
     let height = image_data.height as u32;
-    
+
     // arboard returns bytes in BGRA format on Windows, RGBA on macOS
     // We need to convert to RGBA for the image crate
     let rgba_bytes = if cfg!(target_os = "windows") {
@@ -412,7 +416,9 @@ fn convert_to_png(image_data: &arboard::ImageData) -> Result<Vec<u8>, String> {
 #[cfg(windows)]
 fn get_windows_html_from_clipboard() -> Result<String, String> {
     use windows_sys::Win32::Foundation::{HANDLE, HGLOBAL};
-    use windows_sys::Win32::System::DataExchange::{GetClipboardData, OpenClipboard, CloseClipboard};
+    use windows_sys::Win32::System::DataExchange::{
+        CloseClipboard, GetClipboardData, OpenClipboard,
+    };
     use windows_sys::Win32::System::Memory::{GlobalLock, GlobalUnlock};
 
     const CF_HTML: u32 = 49383; // Registered clipboard format for HTML
@@ -459,10 +465,12 @@ fn get_windows_html_from_clipboard() -> Result<String, String> {
 fn get_windows_files_from_clipboard() -> Result<Vec<String>, String> {
     use std::os::windows::ffi::OsStringExt;
     use windows_sys::Win32::Foundation::{HANDLE, HGLOBAL, MAX_PATH};
-    use windows_sys::Win32::System::DataExchange::{GetClipboardData, OpenClipboard, CloseClipboard};
+    use windows_sys::Win32::System::DataExchange::{
+        CloseClipboard, GetClipboardData, OpenClipboard,
+    };
     use windows_sys::Win32::System::Memory::{GlobalLock, GlobalUnlock};
     use windows_sys::Win32::UI::Shell::DragQueryFileW;
-    
+
     const CF_HDROP: u32 = 15; // Standard clipboard format for file drop
 
     unsafe {
@@ -483,7 +491,7 @@ fn get_windows_files_from_clipboard() -> Result<Vec<String>, String> {
         }
 
         let file_count = DragQueryFileW(hdrop, 0xFFFFFFFF, std::ptr::null_mut(), 0);
-        
+
         let mut files = Vec::new();
         let mut buffer = vec![0u16; MAX_PATH as usize];
 
@@ -527,12 +535,12 @@ fn get_macos_files_from_clipboard() -> Result<Vec<String>, String> {
 #[cfg(target_os = "linux")]
 fn get_linux_files_from_clipboard() -> Result<Vec<String>, String> {
     use std::process::Command;
-    
+
     // Try xclip first (X11)
     let result = Command::new("xclip")
         .args(&["-selection", "clipboard", "-t", "text/uri-list", "-o"])
         .output();
-    
+
     match result {
         Ok(output) if output.status.success() => {
             let urls = String::from_utf8_lossy(&output.stdout);
@@ -550,7 +558,7 @@ fn get_linux_files_from_clipboard() -> Result<Vec<String>, String> {
                     }
                 })
                 .collect();
-            
+
             if files.is_empty() {
                 Err("No files found".to_string())
             } else {
@@ -568,11 +576,11 @@ fn get_linux_files_from_clipboard() -> Result<Vec<String>, String> {
 #[cfg(target_os = "linux")]
 fn get_linux_files_from_wayland() -> Result<Vec<String>, String> {
     use std::process::Command;
-    
+
     let result = Command::new("wl-paste")
         .args(&["--type", "text/uri-list"])
         .output();
-    
+
     match result {
         Ok(output) if output.status.success() => {
             let urls = String::from_utf8_lossy(&output.stdout);
@@ -587,7 +595,7 @@ fn get_linux_files_from_wayland() -> Result<Vec<String>, String> {
                     }
                 })
                 .collect();
-            
+
             if files.is_empty() {
                 Err("No files found".to_string())
             } else {
@@ -603,7 +611,7 @@ fn get_linux_files_from_wayland() -> Result<Vec<String>, String> {
 fn url_decode(s: &str) -> String {
     let mut result = String::new();
     let mut chars = s.chars().peekable();
-    
+
     while let Some(c) = chars.next() {
         if c == '%' {
             let hex: String = chars.by_ref().take(2).collect();
@@ -619,6 +627,6 @@ fn url_decode(s: &str) -> String {
             result.push(c);
         }
     }
-    
+
     result
 }
