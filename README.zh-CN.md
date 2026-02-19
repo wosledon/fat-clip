@@ -13,6 +13,18 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/yourusername/fat-clip/actions/workflows/ci.yml">
+    <img src="https://github.com/yourusername/fat-clip/actions/workflows/ci.yml/badge.svg" alt="CI 状态">
+  </a>
+  <a href="https://github.com/yourusername/fat-clip/releases">
+    <img src="https://img.shields.io/github/v/release/yourusername/fat-clip" alt="最新版本">
+  </a>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/github/license/yourusername/fat-clip" alt="许可证">
+  </a>
+</p>
+
+<p align="center">
   <a href="#功能特性">功能特性</a> •
   <a href="#安装">安装</a> •
   <a href="#使用指南">使用指南</a> •

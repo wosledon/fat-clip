@@ -13,6 +13,18 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/yourusername/fat-clip/actions/workflows/ci.yml">
+    <img src="https://github.com/yourusername/fat-clip/actions/workflows/ci.yml/badge.svg" alt="CI Status">
+  </a>
+  <a href="https://github.com/yourusername/fat-clip/releases">
+    <img src="https://img.shields.io/github/v/release/yourusername/fat-clip" alt="Latest Release">
+  </a>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/github/license/yourusername/fat-clip" alt="License">
+  </a>
+</p>
+
+<p align="center">
   <a href="#features">Features</a> •
   <a href="#installation">Installation</a> •
   <a href="#usage">Usage</a> •

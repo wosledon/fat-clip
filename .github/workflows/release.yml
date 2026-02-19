@@ -1,0 +1,235 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g., v0.1.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  # Create draft release
+  create-release:
+    runs-on: ubuntu-latest
+    outputs:
+      release_id: ${{ steps.create-release.outputs.result }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Get version
+        id: get-version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "VERSION=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
+          else
+            echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          fi
+
+      - name: Create Release
+        id: create-release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data } = await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: process.env.VERSION,
+              name: `Fat Clip ${process.env.VERSION}`,
+              body: '## What\'s New\n\nSee [CHANGELOG.md](CHANGELOG.md) for details.\n\n## Installation\n\n### Windows\n- Download `.msi` or `.exe` installer\n\n### macOS\n- Download `.dmg` installer\n\n### Linux\n- Download `.AppImage` or `.deb` package',
+              draft: true,
+              prerelease: false
+            })
+            return data.id
+
+      - name: Get Upload URL
+        id: get-upload-url
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.tag }}"
+          else
+            VERSION="${GITHUB_REF#refs/tags/}"
+          fi
+          echo "upload_url=https://uploads.github.com/repos/${{ github.repository }}/releases/${{ steps.create-release.outputs.result }}/assets" >> $GITHUB_OUTPUT
+
+  # Build for Windows
+  build-windows:
+    needs: create-release
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Rust
+        uses: dtolnay/rust-action@stable
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli
+
+      - name: Build Tauri App
+        run: cargo tauri build
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+
+      - name: Upload MSI
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}?name=Fat-Clip_${{ github.ref_name }}_x64_en-US.msi
+          asset_path: ./src-tauri/target/release/bundle/msi/Fat Clip_0.1.0_x64_en-US.msi
+          asset_name: Fat-Clip_${{ github.ref_name }}_x64_en-US.msi
+          asset_content_type: application/x-msi
+
+      - name: Upload NSIS
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}?name=Fat-Clip_${{ github.ref_name }}_x64-setup.exe
+          asset_path: ./src-tauri/target/release/bundle/nsis/Fat Clip_0.1.0_x64-setup.exe
+          asset_name: Fat-Clip_${{ github.ref_name }}_x64-setup.exe
+          asset_content_type: application/x-msdownload
+
+  # Build for macOS
+  build-macos:
+    needs: create-release
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Rust
+        uses: dtolnay/rust-action@stable
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli
+
+      - name: Build Tauri App
+        run: cargo tauri build
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+
+      - name: Upload DMG
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}?name=Fat-Clip_${{ github.ref_name }}_x64.dmg
+          asset_path: ./src-tauri/target/release/bundle/dmg/Fat Clip_0.1.0_x64.dmg
+          asset_name: Fat-Clip_${{ github.ref_name }}_x64.dmg
+          asset_content_type: application/x-apple-diskimage
+
+      - name: Upload App
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}?name=Fat-Clip_${{ github.ref_name }}_x64.app.tar.gz
+          asset_path: ./src-tauri/target/release/bundle/macos/Fat Clip.app.tar.gz
+          asset_name: Fat-Clip_${{ github.ref_name }}_x64.app.tar.gz
+          asset_content_type: application/gzip
+
+  # Build for Linux
+  build-linux:
+    needs: create-release
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Rust
+        uses: dtolnay/rust-action@stable
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+          npm ci
+
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli
+
+      - name: Build Tauri App
+        run: cargo tauri build
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+
+      - name: Upload AppImage
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}?name=Fat-Clip_${{ github.ref_name }}_amd64.AppImage
+          asset_path: ./src-tauri/target/release/bundle/appimage/fat-clip_0.1.0_amd64.AppImage
+          asset_name: Fat-Clip_${{ github.ref_name }}_amd64.AppImage
+          asset_content_type: application/x-appimage
+
+      - name: Upload DEB
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}?name=Fat-Clip_${{ github.ref_name }}_amd64.deb
+          asset_path: ./src-tauri/target/release/bundle/deb/fat-clip_0.1.0_amd64.deb
+          asset_name: Fat-Clip_${{ github.ref_name }}_amd64.deb
+          asset_content_type: application/vnd.debian.binary-package
+
+  # Publish release
+  publish-release:
+    needs: [create-release, build-windows, build-macos, build-linux]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish Release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.updateRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: ${{ needs.create-release.outputs.release_id }},
+              draft: false
+            })
