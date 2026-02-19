@@ -58,6 +58,27 @@
 - 假设 `rdev` 在当前权限下可捕获全局按键（部分应用可能仍需管理员权限）。
 
 ## Handoff (Latest First)
+### 2026-02-19 11:30
+- 本次完成：
+  - 进一步补齐 Linux workflow 依赖一致性：`CI build-test(ubuntu)` 与 `Release build-linux` 同步增加 `pkg-config` 与 `libglib2.0-dev`。
+- 未完成：
+  - 尚未在远端 Actions 运行结果中确认（需 push 后观察）。
+- 下一步：
+  - 推送后检查 `CI / build-test (ubuntu-latest)` 与 `Release / build-linux` 是否稳定通过。
+- 关键文件：
+  - .github/workflows/ci.yml
+  - .github/workflows/release.yml
+
+### 2026-02-19 11:20
+- 本次完成：
+  - 修复 Linux CI 中 `glib-sys/gobject-sys` 构建失败：在 `rust-check` job 增加 Ubuntu 系统依赖安装（`pkg-config`、`libglib2.0-dev` 及 Tauri Linux 依赖）。
+- 未完成：
+  - 尚未在 GitHub Actions 实际运行结果中二次确认（本地仅完成工作流文件修复）。
+- 下一步：
+  - 推送后观察 `CI / rust-check`，确认不再出现 `glib-2.0.pc` 与 `gobject-2.0.pc` 缺失错误。
+- 关键文件：
+  - .github/workflows/ci.yml
+
 ### 2026-02-19 10:00
 - 本次完成：
   - 新增 `npm run icon:generate`，统一从 `src-tauri/icons/icon.svg` 生成全部平台图标。
