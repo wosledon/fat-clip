@@ -109,6 +109,8 @@ jobs:
           }
 
       - name: Debug Windows upload context
+        env:
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           echo "release_tag=$RELEASE_TAG"
@@ -181,6 +183,8 @@ jobs:
           fi
 
       - name: Debug macOS upload context
+        env:
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           echo "release_tag=$RELEASE_TAG"
@@ -250,6 +254,8 @@ jobs:
           fi
 
       - name: Debug Linux upload context
+        env:
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           echo "release_tag=$RELEASE_TAG"
