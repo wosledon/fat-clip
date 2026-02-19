@@ -13,14 +13,14 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/yourusername/fat-clip/actions/workflows/ci.yml">
-    <img src="https://github.com/yourusername/fat-clip/actions/workflows/ci.yml/badge.svg" alt="CI Status">
+  <a href="https://github.com/wosledon/fat-clip/actions/workflows/ci.yml">
+    <img src="https://github.com/wosledon/fat-clip/actions/workflows/ci.yml/badge.svg" alt="CI Status">
   </a>
-  <a href="https://github.com/yourusername/fat-clip/releases">
-    <img src="https://img.shields.io/github/v/release/yourusername/fat-clip" alt="Latest Release">
+  <a href="https://github.com/wosledon/fat-clip/releases">
+    <img src="https://img.shields.io/github/v/release/wosledon/fat-clip" alt="Latest Release">
   </a>
   <a href="LICENSE">
-    <img src="https://img.shields.io/github/license/yourusername/fat-clip" alt="License">
+    <img src="https://img.shields.io/github/license/wosledon/fat-clip" alt="License">
   </a>
 </p>
 

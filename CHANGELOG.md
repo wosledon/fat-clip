@@ -28,5 +28,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Material Design UI
 - Windows, macOS, and Linux builds
 
-[Unreleased]: https://github.com/yourusername/fat-clip/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/yourusername/fat-clip/releases/tag/v0.1.0
+[Unreleased]: https://github.com/wosledon/fat-clip/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/wosledon/fat-clip/releases/tag/v0.1.0

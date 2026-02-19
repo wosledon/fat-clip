@@ -5,7 +5,7 @@ Thank you for your interest in contributing to Fat Clip! We welcome contribution
 ## Getting Started
 
 1. Fork the repository
-2. Clone your fork: `git clone https://github.com/yourusername/fat-clip.git`
+2. Clone your fork: `git clone https://github.com/wosledon/fat-clip.git`
 3. Create a new branch: `git checkout -b feature/your-feature-name`
 
 ## Development Setup
