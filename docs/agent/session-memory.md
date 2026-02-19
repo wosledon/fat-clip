@@ -58,6 +58,17 @@
 - 假设 `rdev` 在当前权限下可捕获全局按键（部分应用可能仍需管理员权限）。
 
 ## Handoff (Latest First)
+### 2026-02-19 22:25
+- 本次完成：
+  - 修复 `src-tauri/src/clipboard_monitor.rs` 中 2 处 `clippy::manual_map`（`strip_prefix` 后手动返回 `Some/None` 改为 `Option::map`）。
+  - 已执行并通过：`cargo clippy --all-targets -- -D warnings`。
+- 未完成：
+  - 无。
+- 下一步：
+  - 继续观察 GitHub Actions 多平台 job 是否有平台特定告警。
+- 关键文件：
+  - src-tauri/src/clipboard_monitor.rs
+
 ### 2026-02-19 12:10
 - 本次完成：
   - 修复 Rust `-D warnings` 下的 11 个编译/Clippy 报错：未使用变量、未使用函数、`manual_strip`、`needless_borrows_for_generic_args`、`unnecessary_cast`。

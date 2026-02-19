@@ -556,13 +556,8 @@ fn get_linux_files_from_clipboard() -> Result<Vec<String>, String> {
                 .lines()
                 .filter(|line| !line.starts_with('#'))
                 .filter_map(|line| {
-                    // Convert file:// URL to path
-                    if let Some(path) = line.strip_prefix("file://") {
-                        // URL decode the path
-                        Some(url_decode(path))
-                    } else {
-                        None
-                    }
+                    line.strip_prefix("file://")
+                        .map(|path| url_decode(path))
                 })
                 .collect();
 
@@ -595,11 +590,8 @@ fn get_linux_files_from_wayland() -> Result<Vec<String>, String> {
                 .lines()
                 .filter(|line| !line.starts_with('#'))
                 .filter_map(|line| {
-                    if let Some(path) = line.strip_prefix("file://") {
-                        Some(url_decode(path))
-                    } else {
-                        None
-                    }
+                    line.strip_prefix("file://")
+                        .map(|path| url_decode(path))
                 })
                 .collect();
 
