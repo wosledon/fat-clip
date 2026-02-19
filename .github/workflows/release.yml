@@ -88,10 +88,6 @@ jobs:
 
       - name: Build Tauri App
         run: npx tauri build
-        env:
-          # Signing keys for Tauri updater — see docs/release-setup.md for how to generate and configure these
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
 
       - name: Get app version
         id: get-app-version
@@ -141,10 +137,6 @@ jobs:
 
       - name: Build Tauri App
         run: npx tauri build
-        env:
-          # Signing keys for Tauri updater — see docs/release-setup.md for how to generate and configure these
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
 
       - name: Get app version
         id: get-app-version
@@ -196,10 +188,6 @@ jobs:
 
       - name: Build Tauri App
         run: npx tauri build
-        env:
-          # Signing keys for Tauri updater — see docs/release-setup.md for how to generate and configure these
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
 
       - name: Get app version
         id: get-app-version

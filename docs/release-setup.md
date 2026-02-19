@@ -8,8 +8,8 @@
 
 | Secret 名称 | 是否必须 | 用途 |
 |---|---|---|
-| `TAURI_SIGNING_PRIVATE_KEY` | 是（启用自动更新时） | 用于对 release 产物进行签名，客户端更新器用对应公钥验证安装包真实性 |
-| `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` | 是（与上同） | 解锁上述私钥文件的密码（生成密钥时设置，可为空） |
+| `TAURI_SIGNING_PRIVATE_KEY` | 否（当前未启用） | 用于对 release 产物进行签名，客户端更新器用对应公钥验证安装包真实性 |
+| `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` | 否（当前未启用） | 解锁上述私钥文件的密码（生成密钥时设置，可为空） |
 | `GITHUB_TOKEN` | 自动提供 | GitHub Actions 自动注入，用于创建/上传 Release 资产，**无需手动配置** |
 
 ---
@@ -71,17 +71,23 @@ Private key path: /home/you/.tauri/fat-clip.key
    | `TAURI_SIGNING_PRIVATE_KEY` | 私钥文件的**完整内容**（`cat ~/.tauri/fat-clip.key`） |
    | `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` | 生成密钥时设置的密码（若未设置密码则填空字符串，但仍需创建该 Secret） |
 
-### 不需要自动更新时
+### 不需要自动更新时（当前状态）
 
-如果当前版本暂时不需要自动更新功能，可以在 `release.yml` 中把这两个 `env` 行注释掉，构建仍可正常完成（不会生成 `.sig` 签名文件）：
+当前 `release.yml` 已移除签名相关的 `env` 配置，构建时**不会生成 `.sig` 签名文件**，也不需要在 GitHub Secrets 中配置任何密钥，可直接运行。
+
+### 需要启用自动更新时
+
+当你准备好添加自动更新功能，在 `release.yml` 三个平台的"Build Tauri App"步骤中加回如下 `env`：
 
 ```yaml
 - name: Build Tauri App
   run: npx tauri build
-  # env:
-  #   TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-  #   TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+  env:
+    TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+    TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
 ```
+
+然后按照上方"生成密钥对"和"配置 GitHub Secrets"的步骤完成配置。
 
 ---
 
