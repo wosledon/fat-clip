@@ -56,6 +56,13 @@ jobs:
             core.setOutput('release_id', data.id)
             core.setOutput('upload_url', data.upload_url)
 
+      - name: Debug release metadata
+        run: |
+          echo "event_name=${{ github.event_name }}"
+          echo "ref_name=${{ github.ref_name }}"
+          echo "release_id=${{ steps.create-release.outputs.release_id }}"
+          echo "upload_url=${{ steps.create-release.outputs.upload_url }}"
+
   # Build for Windows
   build-windows:
     needs: create-release
@@ -92,25 +99,37 @@ jobs:
           echo "msi_path=$MSI_PATH" >> $GITHUB_OUTPUT
           echo "nsis_path=$NSIS_PATH" >> $GITHUB_OUTPUT
 
+      - name: Resolve release tag
+        shell: pwsh
+        run: |
+          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+            "RELEASE_TAG=${{ github.event.inputs.tag }}" | Out-File -FilePath $env:GITHUB_ENV -Append
+          } else {
+            "RELEASE_TAG=${{ github.ref_name }}" | Out-File -FilePath $env:GITHUB_ENV -Append
+          }
+
+      - name: Debug Windows upload context
+        shell: bash
+        run: |
+          echo "release_tag=$RELEASE_TAG"
+          echo "release_id=${{ needs.create-release.outputs.release_id }}"
+          echo "upload_url=${{ needs.create-release.outputs.upload_url }}"
+          echo "msi_path=${{ steps.find-windows-assets.outputs.msi_path }}"
+          echo "nsis_path=${{ steps.find-windows-assets.outputs.nsis_path }}"
+          gh --version
+          gh release view "$RELEASE_TAG" --json id,tagName,url,isDraft
+
       - name: Upload MSI
-        uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ${{ steps.find-windows-assets.outputs.msi_path }}
-          asset_name: Fat-Clip_${{ github.ref_name }}.msi
-          asset_content_type: application/x-msi
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: gh release upload "$RELEASE_TAG" "${{ steps.find-windows-assets.outputs.msi_path }}" --clobber
 
       - name: Upload NSIS
-        uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ${{ steps.find-windows-assets.outputs.nsis_path }}
-          asset_name: Fat-Clip_${{ github.ref_name }}-setup.exe
-          asset_content_type: application/x-msdownload
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: gh release upload "$RELEASE_TAG" "${{ steps.find-windows-assets.outputs.nsis_path }}" --clobber
 
   # Build for macOS
   build-macos:
@@ -152,25 +171,35 @@ jobs:
           echo "dmg_path=$DMG_PATH" >> $GITHUB_OUTPUT
           echo "app_tar_path=$APP_TAR_PATH" >> $GITHUB_OUTPUT
 
+      - name: Resolve release tag
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "RELEASE_TAG=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
+          else
+            echo "RELEASE_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          fi
+
+      - name: Debug macOS upload context
+        shell: bash
+        run: |
+          echo "release_tag=$RELEASE_TAG"
+          echo "release_id=${{ needs.create-release.outputs.release_id }}"
+          echo "upload_url=${{ needs.create-release.outputs.upload_url }}"
+          echo "dmg_path=${{ steps.resolve-macos-assets.outputs.dmg_path }}"
+          echo "app_tar_path=${{ steps.resolve-macos-assets.outputs.app_tar_path }}"
+          gh --version
+          gh release view "$RELEASE_TAG" --json id,tagName,url,isDraft
+
       - name: Upload DMG
-        uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ${{ steps.resolve-macos-assets.outputs.dmg_path }}
-          asset_name: Fat-Clip_${{ github.ref_name }}.dmg
-          asset_content_type: application/x-apple-diskimage
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "$RELEASE_TAG" "${{ steps.resolve-macos-assets.outputs.dmg_path }}" --clobber
 
       - name: Upload App
-        uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ${{ steps.resolve-macos-assets.outputs.app_tar_path }}
-          asset_name: Fat-Clip_${{ github.ref_name }}.app.tar.gz
-          asset_content_type: application/gzip
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "$RELEASE_TAG" "${{ steps.resolve-macos-assets.outputs.app_tar_path }}" --clobber
 
   # Build for Linux
   build-linux:
@@ -211,25 +240,35 @@ jobs:
           echo "appimage_path=$APPIMAGE_PATH" >> $GITHUB_OUTPUT
           echo "deb_path=$DEB_PATH" >> $GITHUB_OUTPUT
 
+      - name: Resolve release tag
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "RELEASE_TAG=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
+          else
+            echo "RELEASE_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          fi
+
+      - name: Debug Linux upload context
+        shell: bash
+        run: |
+          echo "release_tag=$RELEASE_TAG"
+          echo "release_id=${{ needs.create-release.outputs.release_id }}"
+          echo "upload_url=${{ needs.create-release.outputs.upload_url }}"
+          echo "appimage_path=${{ steps.find-linux-assets.outputs.appimage_path }}"
+          echo "deb_path=${{ steps.find-linux-assets.outputs.deb_path }}"
+          gh --version
+          gh release view "$RELEASE_TAG" --json id,tagName,url,isDraft
+
       - name: Upload AppImage
-        uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ${{ steps.find-linux-assets.outputs.appimage_path }}
-          asset_name: Fat-Clip_${{ github.ref_name }}.AppImage
-          asset_content_type: application/x-appimage
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "$RELEASE_TAG" "${{ steps.find-linux-assets.outputs.appimage_path }}" --clobber
 
       - name: Upload DEB
-        uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ${{ steps.find-linux-assets.outputs.deb_path }}
-          asset_name: Fat-Clip_${{ github.ref_name }}.deb
-          asset_content_type: application/vnd.debian.binary-package
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "$RELEASE_TAG" "${{ steps.find-linux-assets.outputs.deb_path }}" --clobber
 
   # Publish release
   publish-release:
