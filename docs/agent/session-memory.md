@@ -58,6 +58,21 @@
 - 假设 `rdev` 在当前权限下可捕获全局按键（部分应用可能仍需管理员权限）。
 
 ## Handoff (Latest First)
+### 2026-02-19 12:10
+- 本次完成：
+  - 修复 Rust `-D warnings` 下的 11 个编译/Clippy 报错：未使用变量、未使用函数、`manual_strip`、`needless_borrows_for_generic_args`、`unnecessary_cast`。
+  - 通过条件编译清理平台特定未使用代码（Linux 构建不再触发图像/HTML 相关未使用告警）。
+  - 已执行并通过：`cargo clippy --all-targets -- -D warnings`。
+- 未完成：
+  - 未运行前端或端到端交互测试（本轮仅针对 Rust 编译与 lint）。
+- 下一步：
+  - 如需更高置信度，可执行 `cargo test` 与一次 `npm run tauri build` 全链路验证。
+- 关键文件：
+  - src-tauri/src/clipboard_monitor.rs
+  - src-tauri/src/lib.rs
+  - src-tauri/src/input_panel.rs
+  - src-tauri/src/db.rs
+
 ### 2026-02-19 11:30
 - 本次完成：
   - 进一步补齐 Linux workflow 依赖一致性：`CI build-test(ubuntu)` 与 `Release build-linux` 同步增加 `pkg-config` 与 `libglib2.0-dev`。

@@ -200,8 +200,8 @@ impl Database {
         }
 
         // Check if it's a content type filter
-        if query_lower.starts_with("type:") {
-            let content_type = query_lower[5..].trim();
+        if let Some(content_type) = query_lower.strip_prefix("type:") {
+            let content_type = content_type.trim();
             return self.search_by_content_type(content_type, limit);
         }
 

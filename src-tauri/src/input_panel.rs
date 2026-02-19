@@ -6,6 +6,7 @@ impl InputPanelManager {
     }
 
     #[cfg(target_os = "linux")]
+    #[allow(dead_code)]
     pub fn set_display_server(&self, _server: String) {}
 
     pub fn set_app_handle(&self, _handle: tauri::AppHandle) {}

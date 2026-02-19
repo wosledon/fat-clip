@@ -32,8 +32,10 @@ pub enum ClipboardContent {
 pub struct ClipboardMonitor {
     clipboard_manager: Arc<ClipboardManager>,
     last_text_hash: Arc<Mutex<String>>,
+    #[cfg(not(target_os = "linux"))]
     last_image_hash: Arc<Mutex<String>>,
     last_files_hash: Arc<Mutex<String>>,
+    #[cfg(any(windows, target_os = "macos"))]
     last_html_hash: Arc<Mutex<String>>,
 }
 
@@ -42,8 +44,10 @@ impl ClipboardMonitor {
         ClipboardMonitor {
             clipboard_manager,
             last_text_hash: Arc::new(Mutex::new(String::new())),
+            #[cfg(not(target_os = "linux"))]
             last_image_hash: Arc::new(Mutex::new(String::new())),
             last_files_hash: Arc::new(Mutex::new(String::new())),
+            #[cfg(any(windows, target_os = "macos"))]
             last_html_hash: Arc::new(Mutex::new(String::new())),
         }
     }
@@ -52,8 +56,10 @@ impl ClipboardMonitor {
     pub fn start_monitoring(&self, app_handle: tauri::AppHandle) {
         let clipboard_manager = self.clipboard_manager.clone();
         let last_text_hash = self.last_text_hash.clone();
+        #[cfg(not(target_os = "linux"))]
         let last_image_hash = self.last_image_hash.clone();
         let last_files_hash = self.last_files_hash.clone();
+        #[cfg(any(windows, target_os = "macos"))]
         let last_html_hash = self.last_html_hash.clone();
 
         thread::spawn(move || {
@@ -368,6 +374,7 @@ fn generate_hash(content: &str) -> String {
 }
 
 /// Generate hash for image data
+#[cfg(not(target_os = "linux"))]
 fn generate_image_hash(data: &[u8]) -> String {
     use std::collections::hash_map::DefaultHasher;
     use std::hash::{Hash, Hasher};
@@ -378,6 +385,7 @@ fn generate_image_hash(data: &[u8]) -> String {
 }
 
 /// Convert arboard ImageData to PNG bytes
+#[cfg(not(target_os = "linux"))]
 fn convert_to_png(image_data: &arboard::ImageData) -> Result<Vec<u8>, String> {
     use image::{ImageBuffer, ImageFormat, Rgba};
     use std::io::Cursor;
@@ -484,7 +492,7 @@ fn get_windows_files_from_clipboard() -> Result<Vec<String>, String> {
             return Err("No file data in clipboard".to_string());
         }
 
-        let hdrop = GlobalLock(handle as HGLOBAL) as *mut std::ffi::c_void;
+        let hdrop = GlobalLock(handle as HGLOBAL);
         if hdrop.is_null() {
             CloseClipboard();
             return Err("Failed to lock global memory".to_string());
@@ -538,7 +546,7 @@ fn get_linux_files_from_clipboard() -> Result<Vec<String>, String> {
 
     // Try xclip first (X11)
     let result = Command::new("xclip")
-        .args(&["-selection", "clipboard", "-t", "text/uri-list", "-o"])
+        .args(["-selection", "clipboard", "-t", "text/uri-list", "-o"])
         .output();
 
     match result {
@@ -549,8 +557,7 @@ fn get_linux_files_from_clipboard() -> Result<Vec<String>, String> {
                 .filter(|line| !line.starts_with('#'))
                 .filter_map(|line| {
                     // Convert file:// URL to path
-                    if line.starts_with("file://") {
-                        let path = &line[7..];
+                    if let Some(path) = line.strip_prefix("file://") {
                         // URL decode the path
                         Some(url_decode(path))
                     } else {
@@ -578,7 +585,7 @@ fn get_linux_files_from_wayland() -> Result<Vec<String>, String> {
     use std::process::Command;
 
     let result = Command::new("wl-paste")
-        .args(&["--type", "text/uri-list"])
+        .args(["--type", "text/uri-list"])
         .output();
 
     match result {
@@ -588,8 +595,8 @@ fn get_linux_files_from_wayland() -> Result<Vec<String>, String> {
                 .lines()
                 .filter(|line| !line.starts_with('#'))
                 .filter_map(|line| {
-                    if line.starts_with("file://") {
-                        Some(url_decode(&line[7..]))
+                    if let Some(path) = line.strip_prefix("file://") {
+                        Some(url_decode(path))
                     } else {
                         None
                     }

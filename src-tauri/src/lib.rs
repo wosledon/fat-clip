@@ -444,7 +444,7 @@ async fn is_running_as_admin() -> Result<bool, String> {
 
 // Restart as administrator (Windows only)
 #[tauri::command]
-async fn restart_as_admin(app: tauri::AppHandle) -> Result<(), String> {
+async fn restart_as_admin(_app: tauri::AppHandle) -> Result<(), String> {
     #[cfg(windows)]
     {
         use std::env;
@@ -464,7 +464,7 @@ async fn restart_as_admin(app: tauri::AppHandle) -> Result<(), String> {
             .map_err(|e| format!("Failed to restart as admin: {}", e))?;
 
         // Exit current process
-        app.exit(0);
+        _app.exit(0);
         Ok(())
     }
     #[cfg(not(windows))]
