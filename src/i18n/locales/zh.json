@@ -1,0 +1,220 @@
+{
+  "app": {
+    "name": "Fat Clip",
+    "title": "Fat Clip - 剪贴板管理器"
+  },
+  "common": {
+    "search": "搜索剪贴板...",
+    "navigate": "导航",
+    "source": "来源",
+    "add": "添加",
+    "searchShortcut": "按 / 聚焦搜索",
+    "copy": "复制",
+    "copied": "已复制!",
+    "delete": "删除",
+    "pin": "置顶",
+    "unpin": "取消置顶",
+    "tags": "标签",
+    "save": "保存",
+    "cancel": "取消",
+    "close": "关闭",
+    "back": "返回",
+    "settings": "设置",
+    "items": "个项目",
+    "pinned": "置顶",
+    "recent": "最近",
+    "noClips": "暂无剪贴板内容",
+    "noClipsSearch": "未找到内容",
+    "copyToStart": "复制一些内容开始吧!",
+    "tryDifferentSearch": "尝试其他搜索词",
+    "justNow": "刚刚",
+    "minutesAgo": "{{count}}分钟前",
+    "hoursAgo": "{{count}}小时前",
+    "daysAgo": "{{count}}天前",
+    "note": "注意"
+  },
+  "tags": {
+    "title": "标签",
+    "manage": "管理标签",
+    "add": "添加标签",
+    "remove": "移除标签",
+    "removeConfirm": "确认从所有剪贴项中移除标签“{{tag}}”吗？",
+    "noTags": "暂无标签",
+    "searchByTag": "按标签搜索"
+  },
+  "display": {
+    "compact": "紧凑",
+    "detailed": "详细",
+    "showDetail": "显示详情",
+    "hideDetail": "隐藏详情"
+  },
+  "settings": {
+    "title": "设置",
+    "saveChanges": "保存更改",
+    "saveFailed": "保存失败，请稍后重试",
+    "reset": "重置",
+    "saved": "设置保存成功!",
+    "general": {
+      "title": "常规",
+      "autostart": "开机启动",
+      "showOnStartup": "启动时显示窗口",
+      "startMinimized": "启动时最小化到托盘",
+      "showNotifications": "显示通知"
+    },
+    "window": {
+      "title": "窗口",
+      "alwaysOnTop": "始终置顶"
+    },
+    "experimental": {
+      "title": "实验性功能",
+      "enableInputPanel": "启用输入面板",
+      "inputPanelDescription": "在任何地方输入 {{trigger}} 显示快速粘贴面板",
+      "triggerSequence": "触发序列",
+      "triggerHint": "输入此序列触发输入面板",
+      "disabledNotice": "该功能已临时下线并强制关闭，后续版本再开放。",
+      "displayServer": "显示服务器",
+      "displayServerAuto": "自动检测",
+      "displayServerX11": "X11（xdotool）",
+      "displayServerWayland": "Wayland（支持受限）",
+      "admin": {
+        "title": "以管理员身份运行",
+        "description": "需要管理员权限才能在某些应用中监听键盘输入",
+        "checking": "检查管理员状态中...",
+        "running": "✓ 当前正以管理员身份运行",
+        "notRunning": "⚠ 当前未以管理员身份运行",
+        "restarting": "重启中...",
+        "restart": "以管理员身份重启"
+      }
+    },
+    "shortcuts": {
+      "title": "快捷键",
+      "configure": "配置键盘快捷键",
+      "configureDescription": "自定义应用的所有键盘快捷键",
+      "globalShortcut": "全局快捷键",
+      "shortcutHint": "格式: Ctrl+Shift+V, Alt+Space 等",
+      "shortcutError": "快捷键必须包含至少一个修饰键",
+      "pasteOnSelect": "选择时自动粘贴 (实验性)",
+      "pageTitle": "键盘快捷键",
+      "resetToDefault": "重置为默认",
+      "saveChanges": "保存更改",
+      "saved": "快捷键保存成功!",
+      "globalShortcuts": "全局快捷键",
+      "globalShortcutsDesc": "这些快捷键在窗口隐藏时也能全局使用。",
+      "navigation": "导航",
+      "navigationDesc": "用于在剪贴板项目中导航的快捷键。",
+      "actions": "操作",
+      "actionsDesc": "用于对选中项目执行操作的快捷键。",
+      "system": "系统",
+      "systemDesc": "系统级快捷键。",
+      "numberKeysNote": "数字键 (1-9) 保留用于按位置快速展开项目，无法更改。",
+      "conflicts": "检测到快捷键冲突:",
+      "toggleWindow": {
+        "label": "切换窗口",
+        "desc": "显示或隐藏应用窗口 (全局快捷键)"
+      },
+      "pressKeys": "按下按键...",
+      "recording": "录制中...",
+      "clickToRecord": "点击以录制新的快捷键",
+      "focusSearch": {
+        "label": "聚焦搜索",
+        "desc": "聚焦搜索输入框"
+      },
+      "navigateUp": {
+        "label": "向上导航",
+        "desc": "移动选择到上一个项目"
+      },
+      "navigateDown": {
+        "label": "向下导航",
+        "desc": "移动选择到下一个项目"
+      },
+      "expandItem": {
+        "label": "展开/收起项目",
+        "desc": "切换选中项目的详细视图"
+      },
+      "copySelected": {
+        "label": "复制选中项",
+        "desc": "复制选中项目到剪贴板"
+      },
+      "pinSelected": {
+        "label": "置顶/取消置顶",
+        "desc": "切换选中项目的置顶状态"
+      },
+      "deleteSelected": {
+        "label": "删除选中项",
+        "desc": "删除选中项目"
+      },
+      "openTags": {
+        "label": "打开标签",
+        "desc": "打开选中项目的标签管理对话框"
+      },
+      "closeWindow": {
+        "label": "关闭/取消",
+        "desc": "关闭窗口、取消操作或清除搜索"
+      }
+    },
+    "appearance": {
+      "title": "外观",
+      "theme": "主题",
+      "themeLight": "浅色",
+      "themeDark": "深色",
+      "themeAcrylicLight": "浅色亚克力（透明模糊）",
+      "themeAcrylicDark": "深色亚克力（透明模糊）",
+      "themeSystem": "跟随系统",
+      "accentColor": "强调色",
+      "timelineMode": "时间线样式",
+      "timelineStandard": "标准时间线",
+      "timelineCompact": "紧凑时间线",
+      "timelineOff": "关闭时间线",
+      "language": "语言"
+    },
+    "storage": {
+      "title": "存储",
+      "maxItems": "最大历史条目数",
+      "autoCleanup": "自动清理",
+      "cleanupNever": "从不",
+      "cleanup7Days": "7 天",
+      "cleanup14Days": "14 天",
+      "cleanup30Days": "30 天",
+      "cleanup90Days": "90 天",
+      "manualCleanup": "手动清理",
+      "manualCleanupDesc": "仅清理未置顶内容",
+      "cleanupMode": "清理方式",
+      "cleanupModeRange": "按时间段",
+      "cleanupModeBefore": "某日期之前",
+      "cleanupModeOlderThan": "早于指定天数",
+      "cleanupStartDate": "开始日期",
+      "cleanupEndDate": "结束日期",
+      "cleanupBeforeDate": "日期",
+      "cleanupOlderThanDays": "早于天数",
+      "cleanupAction": "立即清理",
+      "cleanupSuccess": "已清理 {{count}} 条",
+      "cleanupError": "清理失败，请检查输入"
+    }
+  },
+  "inputPanel": {
+    "placeholder": "搜索剪贴板... (输入过滤)",
+    "stats": "{{count}} 个项目 • ↑↓ 导航 • Enter/1-9 选择 • Esc 关闭",
+    "noClips": "未找到内容",
+    "switchedTo": "已切换到：{{preview}}",
+    "searchStats": "搜索: \"{{query}}\" ({{count}})",
+    "countOnly": "{{count}} 个项目",
+    "pasteHint": "{{modifier}}+1~9 粘贴",
+    "modifierCtrl": "Ctrl",
+    "modifierAlt": "Alt",
+    "loadFailed": "输入面板加载失败，请检查窗口权限配置",
+    "noMatch": "未找到匹配内容"
+  },
+  "tray": {
+    "show": "显示",
+    "hide": "隐藏",
+    "settings": "设置",
+    "quit": "退出"
+  },
+  "notifications": {
+    "clipSaved": "已保存剪贴板内容",
+    "clipCopied": "已复制到剪贴板",
+    "clipDeleted": "已删除",
+    "tagAdded": "已添加标签",
+    "tagRemoved": "已移除标签"
+  }
+}

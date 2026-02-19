@@ -1,0 +1,51 @@
+[package]
+name = "fat-clip"
+version = "0.1.0"
+description = "A Tauri App"
+authors = ["you"]
+edition = "2021"
+
+[profile.release]
+opt-level = 3
+lto = true
+strip = true
+codegen-units = 1
+panic = "abort"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+# The `_lib` suffix may seem redundant but it is necessary
+# to make the lib name unique and wouldn't conflict with the bin name.
+# This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
+name = "fat_clip_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon"] }
+tauri-plugin-opener = "2"
+tauri-plugin-clipboard-manager = "2"
+tauri-plugin-global-shortcut = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+rusqlite = { version = "0.38.0", features = ["bundled", "chrono", "serde_json", "uuid"] }
+chrono = { version = "0.4.43", features = ["serde"] }
+base64 = "0.22"
+uuid = { version = "1.21.0", features = ["v4", "serde"] }
+dirs = "6.0.0"
+tauri-plugin-notification = "2.3.3"
+sys-locale = "0.3.2"
+rdev = "0.5.3"
+arboard = { version = "3.4", features = ["image"] }
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "bmp"] }
+tauri-plugin-os = "2.3.2"
+tauri-plugin-autostart = "2"
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.59", features = ["Win32_Foundation", "Win32_Security", "Win32_System_Threading", "Win32_System_DataExchange", "Win32_System_Memory", "Win32_UI_Shell"] }
+
+
+

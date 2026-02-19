@@ -1,0 +1,220 @@
+{
+  "app": {
+    "name": "Fat Clip",
+    "title": "Fat Clip - Clipboard Manager"
+  },
+  "common": {
+    "search": "Search clips...",
+    "navigate": "Navigate",
+    "source": "Source",
+    "add": "Add",
+    "searchShortcut": "Press / to focus",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "delete": "Delete",
+    "pin": "Pin",
+    "unpin": "Unpin",
+    "tags": "Tags",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "back": "Back",
+    "settings": "Settings",
+    "items": "items",
+    "pinned": "pinned",
+    "recent": "Recent",
+    "noClips": "No clips yet",
+    "noClipsSearch": "No clips found",
+    "copyToStart": "Copy something to get started!",
+    "tryDifferentSearch": "Try a different search term",
+    "justNow": "Just now",
+    "minutesAgo": "{{count}}m ago",
+    "hoursAgo": "{{count}}h ago",
+    "daysAgo": "{{count}}d ago",
+    "note": "Note"
+  },
+  "tags": {
+    "title": "Tags",
+    "manage": "Manage Tags",
+    "add": "Add Tag",
+    "remove": "Remove Tag",
+    "removeConfirm": "Are you sure you want to remove tag \"{{tag}}\" from all clips?",
+    "noTags": "No tags",
+    "searchByTag": "Search by tag"
+  },
+  "display": {
+    "compact": "Compact",
+    "detailed": "Detailed",
+    "showDetail": "Show Detail",
+    "hideDetail": "Hide Detail"
+  },
+  "settings": {
+    "title": "Settings",
+    "saveChanges": "Save Changes",
+    "saveFailed": "Save failed. Please try again.",
+    "reset": "Reset",
+    "saved": "Settings saved successfully!",
+    "general": {
+      "title": "General",
+      "autostart": "Start on boot",
+      "showOnStartup": "Show window on startup",
+      "startMinimized": "Start minimized to tray",
+      "showNotifications": "Show notifications"
+    },
+    "window": {
+      "title": "Window",
+      "alwaysOnTop": "Always on top"
+    },
+    "experimental": {
+      "title": "Experimental",
+      "enableInputPanel": "Enable Input Panel",
+      "inputPanelDescription": "Type {{trigger}} anywhere to show quick paste panel",
+      "triggerSequence": "Trigger Sequence",
+      "triggerHint": "Type this sequence to trigger the input panel",
+      "disabledNotice": "This feature is temporarily offline and forcibly disabled. It will be re-enabled in a future version.",
+      "displayServer": "Display Server",
+      "displayServerAuto": "Auto Detect",
+      "displayServerX11": "X11 (xdotool)",
+      "displayServerWayland": "Wayland (limited support)",
+      "admin": {
+        "title": "Run as administrator",
+        "description": "Administrator privileges are required to monitor keyboard input in some applications",
+        "checking": "Checking administrator status...",
+        "running": "✓ Currently running as administrator",
+        "notRunning": "⚠ Not running as administrator",
+        "restarting": "Restarting...",
+        "restart": "Restart as administrator"
+      }
+    },
+    "shortcuts": {
+      "title": "Shortcuts",
+      "configure": "Configure Keyboard Shortcuts",
+      "configureDescription": "Customize all keyboard shortcuts for the application",
+      "globalShortcut": "Global Shortcut",
+      "shortcutHint": "Format: Ctrl+Shift+V, Alt+Space, etc.",
+      "shortcutError": "Shortcut must include at least one modifier key",
+      "pasteOnSelect": "Auto-paste when selecting an item (experimental)",
+      "pageTitle": "Keyboard Shortcuts",
+      "resetToDefault": "Reset to Default",
+      "saveChanges": "Save Changes",
+      "saved": "Shortcuts saved successfully!",
+      "globalShortcuts": "Global Shortcuts",
+      "globalShortcutsDesc": "These shortcuts work system-wide, even when the window is hidden.",
+      "navigation": "Navigation",
+      "navigationDesc": "Shortcuts for navigating through clipboard items.",
+      "actions": "Actions",
+      "actionsDesc": "Shortcuts for performing actions on selected items.",
+      "system": "System",
+      "systemDesc": "System-level shortcuts.",
+      "numberKeysNote": "Number keys (1-9) are reserved for quickly expanding items by their position in the list. This cannot be changed.",
+      "pressKeys": "Press keys...",
+      "recording": "Recording...",
+      "clickToRecord": "Click to record new shortcut",
+      "conflicts": "Shortcut conflicts detected:",
+      "toggleWindow": {
+        "label": "Toggle Window",
+        "desc": "Show or hide the application window (Global shortcut)"
+      },
+      "focusSearch": {
+        "label": "Focus Search",
+        "desc": "Focus the search input field"
+      },
+      "navigateUp": {
+        "label": "Navigate Up",
+        "desc": "Move selection to previous item"
+      },
+      "navigateDown": {
+        "label": "Navigate Down",
+        "desc": "Move selection to next item"
+      },
+      "expandItem": {
+        "label": "Expand/Collapse Item",
+        "desc": "Toggle detailed view of selected item"
+      },
+      "copySelected": {
+        "label": "Copy Selected",
+        "desc": "Copy the selected item to clipboard"
+      },
+      "pinSelected": {
+        "label": "Pin/Unpin Selected",
+        "desc": "Toggle pin status of selected item"
+      },
+      "deleteSelected": {
+        "label": "Delete Selected",
+        "desc": "Delete the selected item"
+      },
+      "openTags": {
+        "label": "Open Tags",
+        "desc": "Open tag management dialog for selected item"
+      },
+      "closeWindow": {
+        "label": "Close/Cancel",
+        "desc": "Close window, cancel operation, or clear search"
+      }
+    },
+    "appearance": {
+      "title": "Appearance",
+      "theme": "Theme",
+      "themeLight": "Light",
+      "themeDark": "Dark",
+      "themeAcrylicLight": "Acrylic Light (Blur)",
+      "themeAcrylicDark": "Acrylic Dark (Blur)",
+      "themeSystem": "System",
+      "accentColor": "Accent Color",
+      "timelineMode": "Timeline Style",
+      "timelineStandard": "Standard Timeline",
+      "timelineCompact": "Compact Timeline",
+      "timelineOff": "Timeline Off",
+      "language": "Language"
+    },
+    "storage": {
+      "title": "Storage",
+      "maxItems": "Maximum History Items",
+      "autoCleanup": "Auto Cleanup",
+      "cleanupNever": "Never",
+      "cleanup7Days": "7 days",
+      "cleanup14Days": "14 days",
+      "cleanup30Days": "30 days",
+      "cleanup90Days": "90 days",
+      "manualCleanup": "Manual Cleanup",
+      "manualCleanupDesc": "Only removes unpinned items",
+      "cleanupMode": "Cleanup mode",
+      "cleanupModeRange": "By date range",
+      "cleanupModeBefore": "Before a date",
+      "cleanupModeOlderThan": "Older than N days",
+      "cleanupStartDate": "Start date",
+      "cleanupEndDate": "End date",
+      "cleanupBeforeDate": "Date",
+      "cleanupOlderThanDays": "Older than (days)",
+      "cleanupAction": "Run cleanup",
+      "cleanupSuccess": "Removed {{count}} items",
+      "cleanupError": "Cleanup failed. Check your input."
+    }
+  },
+  "inputPanel": {
+    "placeholder": "Search clips... (type to filter)",
+    "stats": "{{count}} items • ↑↓ navigate • Enter/1-9 select • Esc close",
+    "noClips": "No clips found",
+    "switchedTo": "Switched to: {{preview}}",
+    "searchStats": "Search: \"{{query}}\" ({{count}})",
+    "countOnly": "{{count}} items",
+    "pasteHint": "{{modifier}}+1~9 paste",
+    "modifierCtrl": "Ctrl",
+    "modifierAlt": "Alt",
+    "loadFailed": "Input panel failed to load. Please check window capability settings",
+    "noMatch": "No matching content"
+  },
+  "tray": {
+    "show": "Show",
+    "hide": "Hide",
+    "settings": "Settings",
+    "quit": "Quit"
+  },
+  "notifications": {
+    "clipSaved": "Clip saved",
+    "clipCopied": "Copied to clipboard",
+    "clipDeleted": "Clip deleted",
+    "tagAdded": "Tag added",
+    "tagRemoved": "Tag removed"
+  }
+}
