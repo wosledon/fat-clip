@@ -19,14 +19,14 @@ Thank you for your interest in contributing to Fat Clip! We welcome contribution
 ### Linux Dependencies
 
 ```bash
-# Ubuntu/Debian
-sudo apt-get install libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+# Ubuntu/Debian (Ubuntu 22.04+)
+sudo apt-get install libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
 # Fedora
-sudo dnf install gtk3-devel webkit2gtk4.0-devel libappindicator-gtk3-devel librsvg2-devel
+sudo dnf install gtk3-devel webkit2gtk4.1-devel libappindicator-gtk3-devel librsvg2-devel
 
 # Arch
-sudo pacman -S gtk3 webkit2gtk libappindicator-gtk3 librsvg
+sudo pacman -S gtk3 webkit2gtk-4.1 libappindicator-gtk3 librsvg
 ```
 
 ### Install and Run
@@ -103,6 +103,10 @@ This project adheres to a code of conduct. By participating, you are expected to
 - Be respectful and inclusive
 - Accept constructive criticism gracefully
 - Focus on what is best for the community
+
+## Release & Signing
+
+For information about the secrets required by the release workflow (`TAURI_SIGNING_PRIVATE_KEY`, `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`), see [docs/release-setup.md](docs/release-setup.md).
 
 ## Questions?
 
