@@ -19,7 +19,7 @@ jobs:
   create-release:
     runs-on: ubuntu-latest
     outputs:
-      release_id: ${{ steps.create-release.outputs.result }}
+      release_id: ${{ steps.create-release.outputs.release_id }}
       upload_url: ${{ steps.create-release.outputs.upload_url }}
 
     steps:
@@ -53,24 +53,13 @@ jobs:
               draft: true,
               prerelease: false
             })
-            return data.id
-
-      - name: Get Upload URL
-        id: get-upload-url
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            VERSION="${{ github.event.inputs.tag }}"
-          else
-            VERSION="${GITHUB_REF#refs/tags/}"
-          fi
-          echo "upload_url=https://uploads.github.com/repos/${{ github.repository }}/releases/${{ steps.create-release.outputs.result }}/assets" >> $GITHUB_OUTPUT
+            core.setOutput('release_id', data.id)
+            core.setOutput('upload_url', data.upload_url)
 
   # Build for Windows
   build-windows:
     needs: create-release
     runs-on: windows-latest
-    strategy:
-      fail-fast: false
 
     steps:
       - uses: actions/checkout@v4
@@ -89,19 +78,28 @@ jobs:
       - name: Build Tauri App
         run: npx tauri build
 
-      - name: Get app version
-        id: get-app-version
+      - name: Find Windows bundles
+        id: find-windows-assets
         shell: bash
-        run: echo "APP_VERSION=$(node -p "require('./src-tauri/tauri.conf.json').version")" >> $GITHUB_ENV
+        run: |
+          MSI_PATH=$(find ./src-tauri/target/release/bundle/msi -maxdepth 1 -name "*.msi" | head -n 1)
+          NSIS_PATH=$(find ./src-tauri/target/release/bundle/nsis -maxdepth 1 -name "*.exe" | head -n 1)
+          if [ -z "$MSI_PATH" ] || [ -z "$NSIS_PATH" ]; then
+            echo "Failed to locate Windows bundle files"
+            find ./src-tauri/target/release/bundle -maxdepth 3 -type f
+            exit 1
+          fi
+          echo "msi_path=$MSI_PATH" >> $GITHUB_OUTPUT
+          echo "nsis_path=$NSIS_PATH" >> $GITHUB_OUTPUT
 
       - name: Upload MSI
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}?name=Fat-Clip_${{ github.ref_name }}_x64_en-US.msi
-          asset_path: ./src-tauri/target/release/bundle/msi/Fat Clip_${{ env.APP_VERSION }}_x64_en-US.msi
-          asset_name: Fat-Clip_${{ github.ref_name }}_x64_en-US.msi
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ${{ steps.find-windows-assets.outputs.msi_path }}
+          asset_name: Fat-Clip_${{ github.ref_name }}.msi
           asset_content_type: application/x-msi
 
       - name: Upload NSIS
@@ -109,17 +107,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}?name=Fat-Clip_${{ github.ref_name }}_x64-setup.exe
-          asset_path: ./src-tauri/target/release/bundle/nsis/Fat Clip_${{ env.APP_VERSION }}_x64-setup.exe
-          asset_name: Fat-Clip_${{ github.ref_name }}_x64-setup.exe
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ${{ steps.find-windows-assets.outputs.nsis_path }}
+          asset_name: Fat-Clip_${{ github.ref_name }}-setup.exe
           asset_content_type: application/x-msdownload
 
   # Build for macOS
   build-macos:
     needs: create-release
     runs-on: macos-latest
-    strategy:
-      fail-fast: false
 
     steps:
       - uses: actions/checkout@v4
@@ -138,18 +134,32 @@ jobs:
       - name: Build Tauri App
         run: npx tauri build
 
-      - name: Get app version
-        id: get-app-version
+      - name: Find macOS bundles
+        id: find-macos-assets
         run: echo "APP_VERSION=$(node -p "require('./src-tauri/tauri.conf.json').version")" >> $GITHUB_ENV
+        shell: bash
+      - name: Resolve macOS asset paths
+        id: resolve-macos-assets
+        shell: bash
+        run: |
+          DMG_PATH=$(find ./src-tauri/target/release/bundle/dmg -maxdepth 1 -name "*.dmg" | head -n 1)
+          APP_TAR_PATH=$(find ./src-tauri/target/release/bundle/macos -maxdepth 1 -name "*.app.tar.gz" | head -n 1)
+          if [ -z "$DMG_PATH" ] || [ -z "$APP_TAR_PATH" ]; then
+            echo "Failed to locate macOS bundle files"
+            find ./src-tauri/target/release/bundle -maxdepth 3 -type f
+            exit 1
+          fi
+          echo "dmg_path=$DMG_PATH" >> $GITHUB_OUTPUT
+          echo "app_tar_path=$APP_TAR_PATH" >> $GITHUB_OUTPUT
 
       - name: Upload DMG
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}?name=Fat-Clip_${{ github.ref_name }}_x64.dmg
-          asset_path: ./src-tauri/target/release/bundle/dmg/Fat Clip_${{ env.APP_VERSION }}_x64.dmg
-          asset_name: Fat-Clip_${{ github.ref_name }}_x64.dmg
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ${{ steps.resolve-macos-assets.outputs.dmg_path }}
+          asset_name: Fat-Clip_${{ github.ref_name }}.dmg
           asset_content_type: application/x-apple-diskimage
 
       - name: Upload App
@@ -157,17 +167,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}?name=Fat-Clip_${{ github.ref_name }}_x64.app.tar.gz
-          asset_path: ./src-tauri/target/release/bundle/macos/Fat Clip.app.tar.gz
-          asset_name: Fat-Clip_${{ github.ref_name }}_x64.app.tar.gz
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ${{ steps.resolve-macos-assets.outputs.app_tar_path }}
+          asset_name: Fat-Clip_${{ github.ref_name }}.app.tar.gz
           asset_content_type: application/gzip
 
   # Build for Linux
   build-linux:
     needs: create-release
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
 
     steps:
       - uses: actions/checkout@v4
@@ -189,18 +197,28 @@ jobs:
       - name: Build Tauri App
         run: npx tauri build
 
-      - name: Get app version
-        id: get-app-version
-        run: echo "APP_VERSION=$(node -p "require('./src-tauri/tauri.conf.json').version")" >> $GITHUB_ENV
+      - name: Find Linux bundles
+        id: find-linux-assets
+        shell: bash
+        run: |
+          APPIMAGE_PATH=$(find ./src-tauri/target/release/bundle/appimage -maxdepth 1 -name "*.AppImage" | head -n 1)
+          DEB_PATH=$(find ./src-tauri/target/release/bundle/deb -maxdepth 1 -name "*.deb" | head -n 1)
+          if [ -z "$APPIMAGE_PATH" ] || [ -z "$DEB_PATH" ]; then
+            echo "Failed to locate Linux bundle files"
+            find ./src-tauri/target/release/bundle -maxdepth 3 -type f
+            exit 1
+          fi
+          echo "appimage_path=$APPIMAGE_PATH" >> $GITHUB_OUTPUT
+          echo "deb_path=$DEB_PATH" >> $GITHUB_OUTPUT
 
       - name: Upload AppImage
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}?name=Fat-Clip_${{ github.ref_name }}_amd64.AppImage
-          asset_path: ./src-tauri/target/release/bundle/appimage/fat-clip_${{ env.APP_VERSION }}_amd64.AppImage
-          asset_name: Fat-Clip_${{ github.ref_name }}_amd64.AppImage
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ${{ steps.find-linux-assets.outputs.appimage_path }}
+          asset_name: Fat-Clip_${{ github.ref_name }}.AppImage
           asset_content_type: application/x-appimage
 
       - name: Upload DEB
@@ -208,9 +226,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}?name=Fat-Clip_${{ github.ref_name }}_amd64.deb
-          asset_path: ./src-tauri/target/release/bundle/deb/fat-clip_${{ env.APP_VERSION }}_amd64.deb
-          asset_name: Fat-Clip_${{ github.ref_name }}_amd64.deb
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ${{ steps.find-linux-assets.outputs.deb_path }}
+          asset_name: Fat-Clip_${{ github.ref_name }}.deb
           asset_content_type: application/vnd.debian.binary-package
 
   # Publish release
