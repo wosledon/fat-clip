@@ -555,10 +555,7 @@ fn get_linux_files_from_clipboard() -> Result<Vec<String>, String> {
             let files: Vec<String> = urls
                 .lines()
                 .filter(|line| !line.starts_with('#'))
-                .filter_map(|line| {
-                    line.strip_prefix("file://")
-                        .map(|path| url_decode(path))
-                })
+                .filter_map(|line| line.strip_prefix("file://").map(|path| url_decode(path)))
                 .collect();
 
             if files.is_empty() {
@@ -589,10 +586,7 @@ fn get_linux_files_from_wayland() -> Result<Vec<String>, String> {
             let files: Vec<String> = urls
                 .lines()
                 .filter(|line| !line.starts_with('#'))
-                .filter_map(|line| {
-                    line.strip_prefix("file://")
-                        .map(|path| url_decode(path))
-                })
+                .filter_map(|line| line.strip_prefix("file://").map(|path| url_decode(path)))
                 .collect();
 
             if files.is_empty() {
