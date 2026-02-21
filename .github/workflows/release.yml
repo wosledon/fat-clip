@@ -180,19 +180,34 @@ jobs:
 
       - name: Find macOS bundles
         id: find-macos-assets
-        run: echo "APP_VERSION=$(node -p "require('./src-tauri/tauri.conf.json').version")" >> $GITHUB_ENV
+        run: echo "APP_VERSION=$(node -p \"require('./src-tauri/tauri.conf.json').version() || require('./src-tauri/tauri.conf.json').version\")" >> $GITHUB_ENV
         shell: bash
       - name: Resolve macOS asset paths
         id: resolve-macos-assets
         shell: bash
         run: |
-          DMG_PATH=$(find ./src-tauri/target/release/bundle/dmg -maxdepth 1 -name "*.dmg" | head -n 1)
-          APP_TAR_PATH=$(find ./src-tauri/target/release/bundle/macos -maxdepth 1 -name "*.app.tar.gz" | head -n 1)
-          if [ -z "$DMG_PATH" ] || [ -z "$APP_TAR_PATH" ]; then
+          # Prefer simple globbing for portability across macOS/Ubuntu runners
+          DMG_PATH=$(ls ./src-tauri/target/release/bundle/dmg/*.dmg 2>/dev/null | head -n 1 || true)
+          APP_TAR_PATH=$(ls ./src-tauri/target/release/bundle/macos/*.app.tar.gz ./src-tauri/target/release/bundle/macos/*.app.zip 2>/dev/null | head -n 1 || true)
+
+          # If no archive is found, check for a .app directory and create a tar.gz
+          if [ -z "$APP_TAR_PATH" ]; then
+            APP_DIR=$(ls -d ./src-tauri/target/release/bundle/macos/*.app 2>/dev/null | head -n 1 || true)
+            if [ -n "$APP_DIR" ]; then
+              APP_NAME=$(basename "$APP_DIR")
+              TAR_NAME="${APP_NAME}.tar.gz"
+              tar -czf "./src-tauri/target/release/bundle/macos/$TAR_NAME" -C "$(dirname "$APP_DIR")" "$APP_NAME"
+              APP_TAR_PATH="./src-tauri/target/release/bundle/macos/$TAR_NAME"
+            fi
+          fi
+
+          # If neither DMG nor an app archive exists, list bundle folder for debugging and fail
+          if [ -z "$DMG_PATH" ] && [ -z "$APP_TAR_PATH" ]; then
             echo "Failed to locate macOS bundle files"
-            find ./src-tauri/target/release/bundle -maxdepth 3 -type f
+            ls -R ./src-tauri/target/release/bundle || true
             exit 1
           fi
+
           echo "dmg_path=$DMG_PATH" >> $GITHUB_OUTPUT
           echo "app_tar_path=$APP_TAR_PATH" >> $GITHUB_OUTPUT
 
@@ -224,6 +239,7 @@ jobs:
           done
 
       - name: Upload DMG
+        if: ${{ steps.resolve-macos-assets.outputs.dmg_path != '' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -236,6 +252,7 @@ jobs:
           exit 1
 
       - name: Upload App
+        if: ${{ steps.resolve-macos-assets.outputs.app_tar_path != '' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
