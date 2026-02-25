@@ -20,11 +20,10 @@ impl TrayManager {
         let app_handle = app.handle().clone();
 
         // Get current language from settings
-        let language = crate::settings::Settings::load(
-            &crate::db::ensure_app_dir().unwrap_or_default(),
-        )
-        .map(|s| s.language)
-        .unwrap_or_else(|_| "en".to_string());
+        let language =
+            crate::settings::Settings::load(&crate::db::ensure_app_dir().unwrap_or_default())
+                .map(|s| s.language)
+                .unwrap_or_else(|_| "en".to_string());
 
         // Get localized text
         let texts = self.get_texts(&language);
