@@ -371,11 +371,11 @@ async fn toggle_main_window(app: tauri::AppHandle) -> Result<bool, String> {
         let is_visible = window.is_visible().map_err(|e| e.to_string())?;
         if is_visible {
             window.hide().map_err(|e| e.to_string())?;
-            Ok(true) // Was visible, now hidden
+            return Ok(true); // Was visible, now hidden
         } else {
             window.show().map_err(|e| e.to_string())?;
             window.set_focus().map_err(|e| e.to_string())?;
-            Ok(false) // Was hidden, now shown
+            return Ok(false); // Was hidden, now shown
         }
     }
     Ok(false)
