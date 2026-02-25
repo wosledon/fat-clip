@@ -194,7 +194,10 @@ fn check_windows_clipboard(
     // Check for HTML content
     match get_windows_html_from_clipboard() {
         Ok(html) if !html.is_empty() => {
-            let text = Clipboard::new().unwrap().get_text().unwrap_or_default();
+            let text = Clipboard::new()
+                .ok()
+                .and_then(|mut c| c.get_text().ok())
+                .unwrap_or_default();
             let combined = format!("{}{}", html, text);
             let hash = generate_hash(&combined);
 
@@ -266,7 +269,10 @@ fn check_macos_clipboard(
     // Check for HTML content
     match get_macos_html_from_clipboard() {
         Ok(html) if !html.is_empty() => {
-            let text = Clipboard::new().unwrap().get_text().unwrap_or_default();
+            let text = Clipboard::new()
+                .ok()
+                .and_then(|mut c| c.get_text().ok())
+                .unwrap_or_default();
             let combined = format!("{}{}", html, text);
             let hash = generate_hash(&combined);
 
