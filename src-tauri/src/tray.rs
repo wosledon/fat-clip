@@ -69,7 +69,9 @@ impl TrayManager {
                 if let TrayIconEvent::DoubleClick { .. } = event {
                     let app = tray.app_handle();
                     if let Some(window) = app.get_webview_window("main") {
-                        if window.is_visible().unwrap_or(false) {
+                        // Toggle window visibility on double click
+                        let is_visible = window.is_visible().unwrap_or(false);
+                        if is_visible {
                             let _ = window.hide();
                         } else {
                             let _ = window.show();

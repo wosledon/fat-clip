@@ -326,11 +326,16 @@ async fn save_settings(
 
     if old_show_on_startup != new_show_on_startup || old_start_minimized != new_start_minimized {
         if let Some(window) = app.get_webview_window("main") {
+            let is_visible = window.is_visible().unwrap_or(false);
             if new_show_on_startup && !new_start_minimized {
-                let _ = window.show();
+                if !is_visible {
+                    let _ = window.show();
+                }
                 let _ = window.set_focus();
             } else {
-                let _ = window.hide();
+                if is_visible {
+                    let _ = window.hide();
+                }
             }
         }
     }
@@ -358,19 +363,45 @@ async fn validate_shortcuts(settings: Settings) -> Result<Vec<String>, String> {
     Ok(settings.validate_shortcuts())
 }
 
+/// Toggle the main window visibility
+/// If window is visible, hide it; otherwise show and focus it
+#[tauri::command]
+async fn toggle_main_window(app: tauri::AppHandle) -> Result<bool, String> {
+    if let Some(window) = app.get_webview_window("main") {
+        let is_visible = window.is_visible().map_err(|e| e.to_string())?;
+        if is_visible {
+            window.hide().map_err(|e| e.to_string())?;
+            Ok(true) // Was visible, now hidden
+        } else {
+            window.show().map_err(|e| e.to_string())?;
+            window.set_focus().map_err(|e| e.to_string())?;
+            Ok(false) // Was hidden, now shown
+        }
+    }
+    Ok(false)
+}
+
+/// Show the main window (only if currently hidden)
 #[tauri::command]
 async fn show_main_window(app: tauri::AppHandle) -> Result<(), String> {
     if let Some(window) = app.get_webview_window("main") {
-        window.show().map_err(|e| e.to_string())?;
+        let is_visible = window.is_visible().map_err(|e| e.to_string())?;
+        if !is_visible {
+            window.show().map_err(|e| e.to_string())?;
+        }
         window.set_focus().map_err(|e| e.to_string())?;
     }
     Ok(())
 }
 
+/// Hide the main window (only if currently visible)
 #[tauri::command]
 async fn hide_main_window(app: tauri::AppHandle) -> Result<(), String> {
     if let Some(window) = app.get_webview_window("main") {
-        window.hide().map_err(|e| e.to_string())?;
+        let is_visible = window.is_visible().map_err(|e| e.to_string())?;
+        if is_visible {
+            window.hide().map_err(|e| e.to_string())?;
+        }
     }
     Ok(())
 }
@@ -574,6 +605,7 @@ pub fn run() {
             save_settings,
             cleanup_clips,
             validate_shortcuts,
+            toggle_main_window,
             show_main_window,
             hide_main_window,
             is_main_window_visible,
@@ -637,8 +669,14 @@ pub fn run() {
                         .with_handler(move |app: &tauri::AppHandle, _shortcut, event| {
                             if event.state == ShortcutState::Pressed {
                                 if let Some(window) = app.get_webview_window("main") {
-                                    let _ = window.show();
-                                    let _ = window.set_focus();
+                                    // Toggle window visibility
+                                    let is_visible = window.is_visible().unwrap_or(false);
+                                    if is_visible {
+                                        let _ = window.hide();
+                                    } else {
+                                        let _ = window.show();
+                                        let _ = window.set_focus();
+                                    }
                                 }
                             }
                         })

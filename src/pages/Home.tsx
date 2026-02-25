@@ -229,7 +229,8 @@ export function Home() {
           setContentTypeFilter("all");
           loadClips();
         } else {
-          getCurrentWindow().hide();
+          // Hide window using backend API for consistent behavior
+          invoke("hide_main_window").catch(console.error);
         }
         return;
       }
@@ -270,7 +271,7 @@ export function Home() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [clips, selectedIndex, expandedId, searchQuery, tagDialogOpen, showSuggestions, selectedTags, loadClips, contentTypeFilter]);
+  }, [clips, selectedIndex, expandedId, searchQuery, tagDialogOpen, showSuggestions, selectedTags, loadClips, contentTypeFilter, invoke]);
 
   const getFilteredClips = () => {
     let filtered = [...clips.filter((c) => c.pinned), ...clips.filter((c) => !c.pinned)];
