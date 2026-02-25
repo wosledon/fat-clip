@@ -332,10 +332,8 @@ async fn save_settings(
                     let _ = window.show();
                 }
                 let _ = window.set_focus();
-            } else {
-                if is_visible {
-                    let _ = window.hide();
-                }
+            } else if is_visible {
+                let _ = window.hide();
             }
         }
     }
